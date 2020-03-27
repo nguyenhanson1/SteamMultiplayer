@@ -1,10 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MainMenu.h"
+
+#include "UObject/ConstructorHelpers.h"
+
 #include "Components/Button.h"
 #include "MenuWidget_Base.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/EditableTextBox.h"
+
+#include "ServerRow.h"
+
+UMainMenu::UMainMenu(const FObjectInitializer & ObjectInitializer)
+{
+	ConstructorHelpers::FClassFinder<UUserWidget> ServerRowBPClass(TEXT("/Game/MenuSystem/WBP_ServerRow"));
+	if (!ensure(ServerRowBPClass.Class != nullptr)) return;
+	ServerRowClass = ServerRowBPClass.Class;
+}
 
 bool UMainMenu::Initialize() {
 
@@ -53,9 +65,16 @@ void UMainMenu::JoinServer() {
 	
 	if (MenuInterface != nullptr)
 	{
-		if (!ensure(IPAddressField != nullptr)) return;
+		/*if (!ensure(IPAddressField != nullptr)) return;
 		const FString& Address = IPAddressField->GetText().ToString();
-		MenuInterface->Join(Address);
+		MenuInterface->Join(Address);*/
+		UWorld* World = this->GetWorld();
+		if (!ensure(World != nullptr)) return;
+
+		UServerRow* Row = CreateWidget<UServerRow>(this, ServerRowClass);
+		if (!ensure(Row != nullptr)) return;
+
+		ServerList->AddChild(Row);
 	}
 }
 
