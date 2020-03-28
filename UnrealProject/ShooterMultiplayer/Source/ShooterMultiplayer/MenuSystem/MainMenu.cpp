@@ -8,8 +8,10 @@
 #include "MenuWidget_Base.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/EditableTextBox.h"
+#include "Components/TextBlock.h"
 
 #include "ServerRow.h"
+
 
 UMainMenu::UMainMenu(const FObjectInitializer & ObjectInitializer)
 {
@@ -17,6 +19,8 @@ UMainMenu::UMainMenu(const FObjectInitializer & ObjectInitializer)
 	if (!ensure(ServerRowBPClass.Class != nullptr)) return;
 	ServerRowClass = ServerRowBPClass.Class;
 }
+
+
 
 bool UMainMenu::Initialize() {
 
@@ -48,10 +52,42 @@ void UMainMenu::HostServer()
 	}
 }
 
+void UMainMenu::SetServerList(TArray<FString> ServerNames)
+{
+	
+	UWorld* World = this->GetWorld();
+	if (!ensure(World != nullptr)) return;
+
+	ServerList->ClearChildren();
+
+	uint32 i = 0;
+
+	for (const FString& ServerName : ServerNames) 
+	{
+		UServerRow* Row = CreateWidget<UServerRow>(this, ServerRowClass);
+		if (!ensure(Row != nullptr)) return;
+
+		Row->ServerName->SetText(FText::FromString(ServerName));
+		Row->Setup(this, i);
+		++i;
+		ServerList->AddChild(Row);
+	}
+	
+}
+
+void UMainMenu::SelectIndex(uint32 Index) 
+{
+	SelectedIndex = Index;
+}
+
 void UMainMenu::OpenJoinMenu() {
 	if (!ensure(MenuSwitcher != nullptr)) return;
 	if (!ensure(JoinMenu != nullptr)) return;
 	MenuSwitcher->SetActiveWidget(JoinMenu);
+	if (MenuInterface != nullptr)
+	{
+		MenuInterface->RefreshServerList();
+	}
 
 }
 
@@ -63,18 +99,14 @@ void UMainMenu::OpenMainMenu() {
 
 void UMainMenu::JoinServer() {
 	
-	if (MenuInterface != nullptr)
+	if (SelectedIndex.IsSet() && MenuInterface != nullptr)
 	{
-		/*if (!ensure(IPAddressField != nullptr)) return;
-		const FString& Address = IPAddressField->GetText().ToString();
-		MenuInterface->Join(Address);*/
-		UWorld* World = this->GetWorld();
-		if (!ensure(World != nullptr)) return;
-
-		UServerRow* Row = CreateWidget<UServerRow>(this, ServerRowClass);
-		if (!ensure(Row != nullptr)) return;
-
-		ServerList->AddChild(Row);
+		UE_LOG(LogTemp, Warning, TEXT("Selected Index %d"), SelectedIndex.GetValue());
+		MenuInterface->Join(SelectedIndex.GetValue());
+;	}
+	else 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Selected Index Not Set"));
 	}
 }
 
