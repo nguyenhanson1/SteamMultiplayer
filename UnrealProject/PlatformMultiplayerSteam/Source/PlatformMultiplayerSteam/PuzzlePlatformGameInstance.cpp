@@ -42,6 +42,7 @@ void UPuzzlePlatformGameInstance::LoadMenu()
 	UE_LOG(LogTemp, Warning, TEXT("Found Class %s"), *MenuClass->GetName());
 	Menu->SetMenuInterface(this);
 	UE_LOG(LogTemp, Warning, TEXT("Found Class %s"), *MenuClass->GetName());
+	
 }
 
 void UPuzzlePlatformGameInstance::LoadPauseMenu()
@@ -69,8 +70,11 @@ void UPuzzlePlatformGameInstance::RefreshServerList()
 	if (SessionSearch.IsValid())
 	{
 		//SessionSearch->bIsLanQuery = true;
+		SessionSearch->MaxSearchResults = 10000;
+		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		UE_LOG(LogTemp, Warning, TEXT("Starting Find Session!"));
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+		
 	}
 }
 
@@ -85,7 +89,7 @@ void UPuzzlePlatformGameInstance::Init() {
 			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::FOnDestroySessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::FOnFindSessionsComplete);
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::FOnJoinSessionComplete);
-			
+		
 		}
 
 	}
@@ -150,6 +154,9 @@ void UPuzzlePlatformGameInstance::FOnFindSessionsComplete(bool Success)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Finish Find Session"));
 		TArray<FString> ServerNames;
+		ServerNames.Add("Test Server 1");
+		ServerNames.Add("Test Server 2");
+		ServerNames.Add("Test Server 3");
 
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 		{
@@ -188,10 +195,10 @@ void UPuzzlePlatformGameInstance::CreateSession()
 	if (SessionInterface.IsValid()) 
 	{
 		FOnlineSessionSettings SessionSettings;
-		SessionSettings.bIsLANMatch = true;
+		SessionSettings.bIsLANMatch = false;
 		SessionSettings.NumPublicConnections = 2;
 		SessionSettings.bShouldAdvertise = true;
-
+		SessionSettings.bUsesPresence = true;
 
 		SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 	}

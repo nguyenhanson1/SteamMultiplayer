@@ -41,7 +41,7 @@ bool UMainMenu::Initialize() {
 
 	if (!ensure(QuitButton != nullptr)) return false;
 	QuitButton->OnClicked.AddDynamic(this, &UMainMenu::QuitPressed);
-
+	
 	return true;
 }
 
@@ -78,6 +78,22 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 void UMainMenu::SelectIndex(uint32 Index) 
 {
 	SelectedIndex = Index;
+	UpdateChildren();
+}
+
+void UMainMenu::UpdateChildren()
+{
+	for (int i = 0;i <  ServerList->GetChildrenCount(); i++)
+	{
+		auto Row = Cast<UServerRow>(ServerList->GetChildAt(i));
+		if (Row != nullptr)
+		{
+			Row->Selected = (SelectedIndex.IsSet() && SelectedIndex.GetValue() == i);
+		}
+
+		
+
+	}
 }
 
 void UMainMenu::OpenJoinMenu() {
@@ -120,3 +136,5 @@ void UMainMenu::QuitPressed()
 
 	PlayerController->ConsoleCommand("quit");
 }
+
+
