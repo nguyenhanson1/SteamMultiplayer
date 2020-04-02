@@ -20,6 +20,7 @@ bool UPauseMenu::Initialize() {
 void UPauseMenu::ClosePauseMenu()
 {
 	TearDown();
+	
 }
 
 void UPauseMenu::ToMainMenu()

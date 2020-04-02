@@ -28,13 +28,19 @@ bool UMainMenu::Initialize() {
 	if (!Success) return false;
 	
 	if (!ensure(HostButton != nullptr)) return false;
-	HostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+	HostButton->OnClicked.AddDynamic(this, &UMainMenu::OpenHostMenu);
 	
 	if (!ensure(JoinButton != nullptr)) return false;
 	JoinButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
 
 	if (!ensure(CancelButton != nullptr)) return false;
 	CancelButton->OnClicked.AddDynamic(this, &UMainMenu::OpenMainMenu);
+
+	if (!ensure(CancelHostButton != nullptr)) return false;
+	CancelHostButton->OnClicked.AddDynamic(this, &UMainMenu::OpenMainMenu);
+
+	if (!ensure(ConfirmHostButton != nullptr)) return false;
+	ConfirmHostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
 
 	if (!ensure(JoinServerButton != nullptr)) return false;
 	JoinServerButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
@@ -47,12 +53,14 @@ bool UMainMenu::Initialize() {
 
 void UMainMenu::HostServer()
 {
+
 	if (this->MenuInterface != nullptr) {
-		this->MenuInterface->Host();
+		FString ServerName = ServerHostName->Text.ToString();
+		this->MenuInterface->Host(ServerName);
 	}
 }
 
-void UMainMenu::SetServerList(TArray<FString> ServerNames)
+void UMainMenu::SetServerList(TArray<FServerData> ServerNames)
 {
 	
 	UWorld* World = this->GetWorld();
@@ -62,12 +70,15 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 
 	uint32 i = 0;
 
-	for (const FString& ServerName : ServerNames) 
+	for (const FServerData& ServerData : ServerNames) 
 	{
 		UServerRow* Row = CreateWidget<UServerRow>(this, ServerRowClass);
 		if (!ensure(Row != nullptr)) return;
 
-		Row->ServerName->SetText(FText::FromString(ServerName));
+		Row->ServerName->SetText(FText::FromString(ServerData.Name));
+		Row->HostUser->SetText(FText::FromString(ServerData.HostUsername));
+		FString FractionText = FString::Printf(TEXT("%d/%d"), ServerData.CurrentPlayers, ServerData.MaxPlayers);
+		Row->ConnectionFraction->SetText(FText::FromString(FractionText));
 		Row->Setup(this, i);
 		++i;
 		ServerList->AddChild(Row);
@@ -105,6 +116,14 @@ void UMainMenu::OpenJoinMenu() {
 		MenuInterface->RefreshServerList();
 	}
 
+}
+
+void UMainMenu::OpenHostMenu()
+{
+	if (!ensure(MenuSwitcher != nullptr)) return;
+	if (!ensure(HostMenu != nullptr)) return;
+	MenuSwitcher->SetActiveWidget(HostMenu);
+	
 }
 
 void UMainMenu::OpenMainMenu() {

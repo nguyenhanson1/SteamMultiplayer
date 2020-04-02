@@ -7,6 +7,18 @@
 #include "MenuWidget_Base.h"
 #include "MainMenu.generated.h"
 
+USTRUCT()
+struct FServerData
+{
+	GENERATED_BODY();
+	
+	FString Name;
+	uint16 CurrentPlayers;
+	uint16 MaxPlayers;
+	FString HostUsername;
+
+};
+
 
 /**
  * 
@@ -19,7 +31,7 @@ class SHOOTERMULTIPLAYER_API UMainMenu : public UMenuWidget_Base
 public:
 	UMainMenu(const FObjectInitializer & ObjectInitializer);
 
-	void SetServerList(TArray<FString> ServerNames);
+	void SetServerList(TArray<FServerData> ServerNames);
 
 	void SelectIndex(uint32 Index);
 protected:
@@ -55,7 +67,22 @@ private:
 	class UWidget* MainMenu;
 
 	UPROPERTY(meta = (BindWidget))
+	class UWidget* HostMenu;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* ServerHostName;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ConfirmHostButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CancelHostButton;
+
+
+	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ServerList;
+
+
 
 		
 	UFUNCTION()
@@ -65,6 +92,9 @@ private:
 		void OpenJoinMenu();
 
 	UFUNCTION()
+		void OpenHostMenu();
+
+	UFUNCTION()
 		void OpenMainMenu();
 
 	UFUNCTION()
@@ -72,6 +102,8 @@ private:
 
 	UFUNCTION()
 		void QuitPressed();
+
+
 
 	TOptional<uint32> SelectedIndex;
 

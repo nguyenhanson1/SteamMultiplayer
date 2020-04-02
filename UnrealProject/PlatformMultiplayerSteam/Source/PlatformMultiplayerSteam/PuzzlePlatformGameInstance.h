@@ -29,7 +29,7 @@ public:
 	virtual void Init();
 
 	UFUNCTION(Exec)
-	void Host() ;
+	void Host(FString ServerName) ;
 	UFUNCTION(Exec)
 	void Join(uint32 Index);
 
@@ -54,5 +54,7 @@ private:
 
 	void FOnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
+	FString DesiredServerName;
 	void CreateSession();
+
 };
