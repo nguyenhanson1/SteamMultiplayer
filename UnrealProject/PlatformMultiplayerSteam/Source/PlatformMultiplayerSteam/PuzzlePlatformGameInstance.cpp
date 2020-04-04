@@ -135,7 +135,7 @@ void UPuzzlePlatformGameInstance::FOnCreateSessionComplete(FName SessionName, bo
 	UWorld* World = GetWorld();
 	if (!ensure(World != nullptr)) return;
 
-	World->ServerTravel("/Game/Blueprint/Maps/ThirdPersonExampleMap?listen");
+	World->ServerTravel("/Game/Blueprint/Maps/Lobby?listen");
 
 	
 
