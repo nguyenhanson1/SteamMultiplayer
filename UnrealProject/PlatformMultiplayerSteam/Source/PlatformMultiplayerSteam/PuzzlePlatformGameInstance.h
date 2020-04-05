@@ -37,6 +37,9 @@ public:
 
 	void RefreshServerList() override;
 
+	void StartSession();
+
+
 private:
 	TSubclassOf<class UMenuWidget_Base> MenuClass;
 	TSubclassOf<class UMenuWidget_Base> PauseMenuClass;

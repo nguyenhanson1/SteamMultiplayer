@@ -16,7 +16,7 @@
 #include "MenuSystem/MainMenu.h"
 #include "MenuSystem/MenuWidget_Base.h"
 
-const static FName SESSION_NAME = TEXT("My Session Name");
+const static FName SESSION_NAME = TEXT("GameSession");
 const static FName SERVER_NAME_SETTINGS_KEY = TEXT("SessionName");
 
 UPuzzlePlatformGameInstance::UPuzzlePlatformGameInstance(const FObjectInitializer & ObjectInitializer) 
@@ -76,6 +76,14 @@ void UPuzzlePlatformGameInstance::RefreshServerList()
 		UE_LOG(LogTemp, Warning, TEXT("Starting Find Session!"));
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 		
+	}
+}
+
+void UPuzzlePlatformGameInstance::StartSession()
+{
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->StartSession(SESSION_NAME);
 	}
 }
 
@@ -221,7 +229,7 @@ void UPuzzlePlatformGameInstance::CreateSession()
 		{
 			SessionSettings.bIsLANMatch = false;
 		}
-		SessionSettings.NumPublicConnections = 2;
+		SessionSettings.NumPublicConnections = 5;
 		SessionSettings.bShouldAdvertise = true;
 		SessionSettings.bUsesPresence = true;
 		SessionSettings.Set(SERVER_NAME_SETTINGS_KEY, FString(DesiredServerName), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
